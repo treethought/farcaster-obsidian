@@ -2,120 +2,134 @@ import * as http from "http";
 import { Editor, MarkdownView, Notice, Plugin, WorkspaceLeaf } from "obsidian";
 import { ComposerModal } from "./composer";
 import { FeedView, VIEW_TYPE_FEED } from "./feed";
+import { Client } from "./neynar";
 import {
-	DEFAULT_SETTINGS,
-	FarcasterSettings,
-	FarcasterSettingTab,
+  DEFAULT_SETTINGS,
+  FarcasterSettings,
+  FarcasterSettingTab,
 } from "./settings";
 
 export default class Farcaster extends Plugin {
-	settings: FarcasterSettings;
-	private server: http.Server | null = null;
+  settings: FarcasterSettings;
+  client: Client;
+  private server: http.Server | null = null;
 
-	async onload() {
-		this.registerView(VIEW_TYPE_FEED, (leaf) => new FeedView(leaf));
+  async onload() {
+    this.registerView(VIEW_TYPE_FEED, (leaf) => new FeedView(leaf));
 
-		await this.loadSettings();
+    await this.loadSettings();
 
-		console.log("Farcaster loaded");
+    this.client = new Client(
+      this.settings.neynarClientId,
+      this.settings.neynarAPIKey,
+    );
+    this.client.setSignerData(this.settings.signerUUID, this.settings.fid);
 
-		this.addRibbonIcon("dice", "Farcaster", () => {
-			this.activateView();
-		});
+    console.log("Farcaster loaded");
 
-		this.addCommand({
-			id: "farcaster-cast",
-			name: "Publish a Cast",
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				this.showComposer();
-			},
-		});
+    this.addRibbonIcon("dice", "Farcaster", () => {
+      this.activateView();
+    });
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new FarcasterSettingTab(this.app, this));
-	}
+    this.addCommand({
+      id: "farcaster-cast",
+      name: "Publish a Cast",
+      editorCallback: (editor: Editor, view: MarkdownView) => {
+        this.showComposer();
+      },
+    });
 
-	async activateView() {
-		const { workspace } = this.app;
+    // This adds a settings tab so the user can configure various aspects of the plugin
+    this.addSettingTab(new FarcasterSettingTab(this.app, this));
+  }
 
-		let leaf: WorkspaceLeaf | null = null;
-		const leaves = workspace.getLeavesOfType(VIEW_TYPE_FEED);
+  async activateView() {
+    const { workspace } = this.app;
 
-		if (leaves.length > 0) {
-			// A leaf with our view already exists, use that
-			leaf = leaves[0];
-			workspace.revealLeaf(leaf);
-			return;
-		}
+    let leaf: WorkspaceLeaf | null = null;
+    const leaves = workspace.getLeavesOfType(VIEW_TYPE_FEED);
 
-		// Our view could not be found in the workspace, create a new leaf
-		// in the right sidebar for it
-		leaf = workspace.getRightLeaf(true);
-		await leaf?.setViewState({ type: VIEW_TYPE_FEED, active: true });
+    if (leaves.length > 0) {
+      // A leaf with our view already exists, use that
+      leaf = leaves[0];
+      workspace.revealLeaf(leaf);
+      return;
+    }
 
-		// "Reveal" the leaf in case it is in a collapsed sidebar
-		if (leaf) {
-			workspace.revealLeaf(leaf);
-		}
-	}
+    // Our view could not be found in the workspace, create a new leaf
+    // in the right sidebar for it
+    leaf = workspace.getRightLeaf(true);
+    await leaf?.setViewState({ type: VIEW_TYPE_FEED, active: true });
 
-	onunload() {
-		console.log("Farcaster unloaded");
+    // "Reveal" the leaf in case it is in a collapsed sidebar
+    if (leaf) {
+      workspace.revealLeaf(leaf);
+    }
+  }
 
-		if (this.server) {
-			this.server.close(() => {
-				console.log("Server closed");
-			});
-		}
-	}
+  onunload() {
+    console.log("Farcaster unloaded");
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
+    if (this.server) {
+      this.server.close(() => {
+        console.log("Server closed");
+      });
+    }
+  }
 
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
 
-	async handleAuthResult(signerUUID: string | null, fid: string | null) {
-		this.settings.signerUUID = signerUUID;
-		this.settings.fid = fid;
-		await this.saveSettings();
-		console.log("stopping auth server");
-		this.server?.close();
-	}
+  async saveSettings() {
+    await this.saveData(this.settings);
+    this.client.setSignerData(this.settings.signerUUID, this.settings.fid);
+    this.client.setCredentials(
+      this.settings.neynarAPIKey,
+      this.settings.neynarClientId,
+    );
+  }
 
-	async startServer() {
-		const PORT = 9123;
+  async handleAuthResult(signerUUID: string | null, fid: string | null) {
+    console.log("handleAuthResult", signerUUID, fid);
+    this.settings.signerUUID = signerUUID;
+    this.settings.fid = fid;
+    await this.saveSettings();
+    console.log("stopping auth server");
+    this.server?.close();
+  }
 
-		new Notice("starting server");
-		this.server = http.createServer(async (req, res) => {
-			console.log(req.method, req.url);
-			if (req.method === "GET" && req.url?.startsWith("/signin/success")) {
-				const url = new URL(req.url, `http://127.0.0.1:${PORT}`);
-				const fid = url.searchParams.get("fid");
-				const signer_uuid = url.searchParams.get("signer_uuid");
+  async startServer() {
+    const PORT = 9123;
 
-				if (fid === null || signer_uuid === null) {
-					console.log("Invalid request");
-					res.writeHead(400, { "Content-Type": "text/plain" });
-				}
+    new Notice("starting server");
+    this.server = http.createServer(async (req, res) => {
+      console.log(req.method, req.url);
+      if (req.method === "GET" && req.url?.startsWith("/signin/success")) {
+        const url = new URL(req.url, `http://127.0.0.1:${PORT}`);
+        const fid = url.searchParams.get("fid");
+        const signer_uuid = url.searchParams.get("signer_uuid");
 
-				res.writeHead(200, { "Content-Type": "text/plain" });
-				res.end("Sign in successful!");
-				this.handleAuthResult(signer_uuid, fid);
-			} else {
-				res.writeHead(404, { "Content-Type": "text/plain" });
-				res.end("Not found");
-			}
-		});
+        if (fid === null || signer_uuid === null) {
+          console.log("Invalid request");
+          res.writeHead(400, { "Content-Type": "text/plain" });
+        }
 
-		this.server.listen(PORT, () => {
-			console.log(`Server is running on port ${PORT}`);
-		});
-	}
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.end("Sign in successful!");
+        this.handleAuthResult(signer_uuid, fid);
+      } else {
+        res.writeHead(404, { "Content-Type": "text/plain" });
+        res.end("Not found");
+      }
+    });
 
-	showComposer() {
-		new ComposerModal(this.app, this.settings).open();
-	}
+    this.server.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  }
+
+  showComposer() {
+    new ComposerModal(this.app, this).open();
+  }
 }

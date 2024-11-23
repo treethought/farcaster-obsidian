@@ -1,16 +1,26 @@
-import { App, Modal, Notice, Setting } from "obsidian";
-import Farcaster from "./plugin";
+import * as http from "http";
+import { publishCast } from "neynar";
+import {
+  App,
+  Editor,
+  MarkdownView,
+  Modal,
+  Notice,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+} from "obsidian";
 
-export class ComposerModal extends Modal {
-  plugin: Farcaster;
-  constructor(app: App, plugin: Farcaster) {
+class ComposerModal extends Modal {
+  settings: FarcasterSettings;
+  constructor(app: App, settings: FarcasterSettings) {
     super(app);
-    this.plugin = plugin;
+    this.settings = settings;
   }
 
   onOpen() {
     const { contentEl } = this;
-    if (!this.plugin.settings.signerUUID) {
+    if (!this.settings.signerUUID) {
       new Notice("Please sign in with Neynar first in the settings");
       this.setTitle("Not signed in");
       return;
@@ -32,8 +42,13 @@ export class ComposerModal extends Modal {
           .setButtonText("Cast")
           .setCta()
           .onClick(async () => {
+            console.log("publishing cast: ", this.settings.signerUUID, content);
             try {
-              const resp = await this.plugin.client.publishCast(content);
+              const resp = await publishCast(
+                this.settings.neynarAPIKey,
+                this.settings.signerUUID || "",
+                content,
+              );
               const res = await resp.json();
               console.log("Cast published", res);
               if (!res.success) {

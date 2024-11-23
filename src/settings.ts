@@ -1,8 +1,4 @@
-import {
-  App,
-  PluginSettingTab,
-  Setting,
-} from "obsidian";
+import { App, PluginSettingTab, Setting } from "obsidian";
 import Farcaster from "./plugin";
 
 const SIGNIN_URL =
@@ -54,7 +50,7 @@ export class FarcasterSettingTab extends PluginSettingTab {
       .setDesc("Client ID for your own Neynar app")
       .addText((text) =>
         text
-          .setPlaceholder("")
+          // .setPlaceholder("")
           .setValue(this.plugin.settings.neynarClientId)
           .onChange(async (value) => {
             this.plugin.settings.neynarClientId = value;
