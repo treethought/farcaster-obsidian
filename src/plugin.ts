@@ -34,8 +34,20 @@ export default class Farcaster extends Plugin {
     this.addCommand({
       id: "farcaster-cast",
       name: "Publish a Cast",
-      editorCallback: (editor: Editor, view: MarkdownView) => {
+      callback: () => {
         this.showComposer();
+      },
+    });
+
+    this.addCommand({
+      id: "farcaster-cast-current-note",
+      name: "Publish note as Cast",
+      editorCallback: (editor: Editor, view: MarkdownView) => {
+        let text = editor.getSelection();
+        if (!text) {
+          text = view.getViewData();
+        }
+        this.showComposer(text);
       },
     });
 
@@ -128,7 +140,7 @@ export default class Farcaster extends Plugin {
     });
   }
 
-  showComposer() {
-    new ComposerModal(this.app, this).open();
+  showComposer(content: string = "") {
+    new ComposerModal(this.app, this, content).open();
   }
 }

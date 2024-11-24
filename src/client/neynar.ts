@@ -48,11 +48,7 @@ export class Client {
     if (!this.signerUUID) {
       throw new Error("No signer UUID set");
     }
-    console.log(
-      "publishing cast: ",
-      this.signerUUID,
-      text,
-    );
+    console.log("publishing cast: ");
     let url = this.baseUrl + "/cast";
 
     let resp = await this.doRequest("POST", url, {
