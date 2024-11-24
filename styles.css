@@ -1,62 +1,3 @@
-.avatar {
-	width: 50px;
-	height: 50px;
-	border-radius: 50%;
-	padding: 8px;
-}
-
-.cast-header {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	border-radius: 1px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	border-bottom: 1px solid #e2e8f0;
-	padding: 2px;
-}
-
-.cast-content {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	word-wrap: break-word;
-}
-
-.cast-card {
-	display: flex;
-	flex-direction: column;
-	max-width: 600px;
-	width: 80%;
-
-	background-color: var(--background-primary-alt);
-
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	padding: 20px;
-	margin: 10px;
-	word-break: break-all;
-	text-overflow: ellipsis;
-}
-
-.cast-recast-embed {
-	background-color: var(--background-secondary-alt);
-	width: "100%";
-}
-
-.cast-feed {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	border-width: var(--border-width*2);
-	border-color: var(--color-base-10);
-	/* border-color: var(--background-modifier-border); */
-	border-style: solid;
-	/* border: 1px solid #e2e8f0; */
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	padding: 20px;
-}
-
 .modal-content-wrapper {
 	display: flex;
 	flex-direction: column;
@@ -71,4 +12,112 @@
 	margin-top: 10px;
 	padding-right: var(--size-4-6);
 	margin-bottom: var(--size-4-2);
+}
+
+/*.avatar {*/
+/*	width: 50px;*/
+/*	height: 50px;*/
+/*	border-radius: 50%;*/
+/*	padding: 8px;*/
+/*}*/
+
+.cast-feed {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border-width: var(--border-width*2);
+	border-color: var(--color-base-10);
+	border-style: solid;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	padding: 20px;
+}
+
+.cast-recast-embed {
+	background-color: var(--background-secondary-alt);
+	width: "100%";
+}
+
+.cast-card {
+	display: flex;
+	flex-direction: column;
+	width: 90%;
+	max-width: 600px;
+	max-height: 800px;
+	height: 80%;
+	border-color: var(--background-modifier-border);
+	border-style: solid;
+	border-radius: 10px;
+	border-width: var(--border-width);
+	background-color: var(--background-primary-alt);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	/* Center card with margin */
+	margin: 20px auto;
+	overflow: hidden;
+}
+
+.cast-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 10px;
+	gap: 10px;
+	border-bottom: 1px solid var(--background-modifier-border-focus);
+}
+
+.avatar {
+	width: 45px;
+	height: 45px;
+	border-radius: 50%;
+	object-fit: cover;
+
+}
+
+.author {
+	font-weight: bold;
+	font-size: 1rem;
+	/* Truncate long names with ellipsis */
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.cast-content {
+	display: flex;
+	flex-direction: column;
+	/* Use 40% of the card height if possible */
+	flex: 1 1 40%;
+	padding: 10px 15px;
+	/* Ensure long text wraps */
+	word-break: break-word;
+	overflow: hidden;
+}
+
+.cast-media {
+	display: flex;
+	direction: column;
+	justify-content: center;
+	align-items: center;
+	max-height: 40%;
+	/* Use 40% of the card height if possible */
+	/* flex: 1 1 40%; */
+	padding: 10px;
+	border-top: 1px solid var(--background-modifier-border-focus);
+	overflow: hidden;
+}
+
+.cast-embed-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.cast-embed-image {
+	max-width: 100%;
+	height: 400px;
+	max-height: 100%;
+	object-fit: contain;
+	border-radius: 5px;
 }

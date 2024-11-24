@@ -84,12 +84,19 @@ const CastCard = (props: { cast: Cast | CastEmbed; embed?: boolean }) => {
         <span className="author">{props.cast.author.display_name}</span>
       </div>
 
-      <div className="cast-content">
-        <p>{props.cast.text}</p>
-      </div>
+      {props.cast?.text && (
+        <div className="cast-content">
+          <p>{props.cast.text}</p>
+        </div>
+      )}
       <div className="cast-media">
         {props.cast?.embeds?.map((embed, i) => (
-          <Embed embed={embed} key={props.cast.hash + "embed" + i} />
+          <div
+            className="cast-embed-container"
+            key={props.cast.hash + "embed" + i}
+          >
+            <Embed embed={embed} />
+          </div>
         ))}
       </div>
     </div>
@@ -101,7 +108,12 @@ const Embed = (props: { embed: Embed }) => {
     return <CastCard cast={props.embed.cast} embed />;
   }
   if (props.embed?.metadata?.image) {
-    return <img src={props.embed.url} />;
+    return (
+      <img
+        className="cast-embed-image"
+        src={props.embed.url}
+      />
+    );
   }
 
   return null;

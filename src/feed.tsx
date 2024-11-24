@@ -30,7 +30,7 @@ export class FeedView extends ItemView {
     this.root.render(
       <StrictMode>
         <Feed client={this.plugin.client} />,
-      </StrictMode>,
+      </StrictMode>
     );
   }
 
