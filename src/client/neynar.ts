@@ -1,3 +1,5 @@
+import { CastsResponse } from "./types";
+
 export class Client {
   apiKey: string;
   clientId: string;
@@ -65,5 +67,26 @@ export class Client {
         `Failed to publish cast: ${resp.status} ${resp.statusText}`,
       );
     }
+  }
+
+  async getFeed(): Promise<CastsResponse> {
+    let path = "/feed/following" +
+      `?with_recasts=true&fid=${this.fid}&viewr_fid=${this.fid}`;
+    let url = this.baseUrl + path;
+    let resp = await this.doRequest("GET", url, null);
+
+    if (resp.status !== 200) {
+      throw new Error(
+        `Failed to get cast feed ${resp.status} ${resp.statusText}`,
+      );
+    }
+    let result = await resp.json();
+    let castResponse = result as CastsResponse;
+    if (castResponse.casts) {
+      console.log("Casts response", castResponse);
+      return castResponse;
+    }
+
+    throw new Error("Invalid response");
   }
 }

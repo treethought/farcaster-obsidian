@@ -1,8 +1,58 @@
-/*
+.avatar {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	padding: 8px;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.cast-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	border-radius: 1px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	border-bottom: 1px solid #e2e8f0;
+	padding: 2px;
+}
 
-If your plugin does not need CSS, delete this file.
+.cast-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	word-wrap: break-word;
+}
 
-*/
+.cast-card {
+	display: flex;
+	flex-direction: column;
+	max-width: 600px;
+	width: 80%;
+
+	background-color: var(--background-primary-alt);
+
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	padding: 20px;
+	margin: 10px;
+	word-break: break-all;
+	text-overflow: ellipsis;
+}
+
+.cast-recast-embed {
+	background-color: var(--background-secondary-alt);
+	width: "100%";
+}
+
+.cast-feed {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border-width: var(--border-width*2);
+	border-color: var(--color-base-10);
+	/* border-color: var(--background-modifier-border); */
+	border-style: solid;
+	/* border: 1px solid #e2e8f0; */
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	padding: 20px;
+}

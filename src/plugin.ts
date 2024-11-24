@@ -2,7 +2,7 @@ import * as http from "http";
 import { Editor, MarkdownView, Notice, Plugin, WorkspaceLeaf } from "obsidian";
 import { ComposerModal } from "./composer";
 import { FeedView, VIEW_TYPE_FEED } from "./feed";
-import { Client } from "./neynar";
+import { Client } from "./client/neynar";
 import {
   DEFAULT_SETTINGS,
   FarcasterSettings,
@@ -15,13 +15,12 @@ export default class Farcaster extends Plugin {
   private server: http.Server | null = null;
 
   async onload() {
-    this.registerView(VIEW_TYPE_FEED, (leaf) => new FeedView(leaf));
-
     await this.loadSettings();
+    this.registerView(VIEW_TYPE_FEED, (leaf) => new FeedView(leaf, this));
 
     this.client = new Client(
-      this.settings.neynarClientId,
       this.settings.neynarAPIKey,
+      this.settings.neynarClientId,
     );
     this.client.setSignerData(this.settings.signerUUID, this.settings.fid);
 
@@ -31,6 +30,7 @@ export default class Farcaster extends Plugin {
       this.activateView();
     });
 
+    console.log("Adding command");
     this.addCommand({
       id: "farcaster-cast",
       name: "Publish a Cast",
@@ -58,7 +58,7 @@ export default class Farcaster extends Plugin {
 
     // Our view could not be found in the workspace, create a new leaf
     // in the right sidebar for it
-    leaf = workspace.getRightLeaf(true);
+    leaf = workspace.getRightLeaf(false);
     await leaf?.setViewState({ type: VIEW_TYPE_FEED, active: true });
 
     // "Reveal" the leaf in case it is in a collapsed sidebar
@@ -91,7 +91,7 @@ export default class Farcaster extends Plugin {
   }
 
   async handleAuthResult(signerUUID: string | null, fid: string | null) {
-    console.log("handleAuthResult", signerUUID, fid);
+    console.log("sinw signer success");
     this.settings.signerUUID = signerUUID;
     this.settings.fid = fid;
     await this.saveSettings();
@@ -102,7 +102,6 @@ export default class Farcaster extends Plugin {
   async startServer() {
     const PORT = 9123;
 
-    new Notice("starting server");
     this.server = http.createServer(async (req, res) => {
       console.log(req.method, req.url);
       if (req.method === "GET" && req.url?.startsWith("/signin/success")) {
@@ -125,7 +124,7 @@ export default class Farcaster extends Plugin {
     });
 
     this.server.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`SINW callback server is running on port ${PORT}`);
     });
   }
 
