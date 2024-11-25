@@ -1,5 +1,5 @@
 import * as http from "http";
-import { Editor, MarkdownView, Notice, Plugin, WorkspaceLeaf } from "obsidian";
+import { addIcon, Editor, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
 import { ComposerModal } from "./composer";
 import { FeedView, VIEW_TYPE_FEED } from "./feed";
 import { Client } from "./client/neynar";

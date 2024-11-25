@@ -3,6 +3,7 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { createRoot, Root } from "react-dom/client";
 import Feed from "./components/feed";
 import Farcaster from "./plugin";
+import { AppContext } from "./context";
 
 export const VIEW_TYPE_FEED = "farcaster-feed-view";
 
@@ -26,12 +27,15 @@ export class FeedView extends ItemView {
 
   async onOpen() {
     this.root = createRoot(this.containerEl.children[1]);
-    console.log("FeedView onOpen");
-    console.log(this.plugin.client);
     this.root.render(
       <StrictMode>
-        <Feed client={this.plugin.client} />,
-      </StrictMode>
+        <AppContext.Provider value={{ app: this.app, plugin: this.plugin }}>
+          <Feed
+            client={this.plugin.client}
+            showComposer={this.plugin.showComposer}
+          />
+        </AppContext.Provider>
+      </StrictMode>,
     );
   }
 

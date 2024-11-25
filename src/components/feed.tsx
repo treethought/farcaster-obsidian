@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Cast, CastEmbed, CastsResponse, Embed } from "../client/types";
 import { Client } from "../client/neynar";
+import { AppContext, useAppCtx } from "src/context";
 type Props = {
   client: Client;
+  showComposer: () => void;
 };
 
 const Cast = (props: { cast: Cast }) => {
@@ -16,6 +18,7 @@ const Cast = (props: { cast: Cast }) => {
 };
 
 const Feed = (props: Props) => {
+  const { plugin } = useAppCtx();
   const [feed, setFeed] = useState<CastsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,6 +58,7 @@ const Feed = (props: Props) => {
       >
         <h1>Feed</h1>
         <button onClick={fetchFeed}>Refresh</button>
+        <button onClick={() => plugin.showComposer()}>Cast</button>
       </div>
       {error && <div>Error: {error}</div>}
       <div className="cast-feed">
@@ -79,9 +83,9 @@ const CastCard = (props: { cast: Cast | CastEmbed; embed?: boolean }) => {
       <div className="cast-header">
         <img
           className="avatar"
-          src={props.cast.author.pfp_url}
+          src={props.cast.author?.pfp_url}
         />
-        <span className="author">{props.cast.author.display_name}</span>
+        <span className="author">{props.cast.author?.display_name}</span>
       </div>
 
       {props.cast?.text && (
