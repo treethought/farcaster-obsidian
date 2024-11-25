@@ -50,7 +50,6 @@ export class FarcasterSettingTab extends PluginSettingTab {
       .setDesc("Client ID for your own Neynar app")
       .addText((text) =>
         text
-          // .setPlaceholder("")
           .setValue(this.plugin.settings.neynarClientId)
           .onChange(async (value) => {
             this.plugin.settings.neynarClientId = value;

@@ -1,4 +1,4 @@
-import { CastsResponse } from "./types";
+import { Cast, CastsResponse, ChannelsResponse } from "./types";
 
 export class Client {
   apiKey: string;
@@ -84,5 +84,22 @@ export class Client {
     }
 
     throw new Error("Invalid response");
+  }
+  async getCastByUrl(u: string): Promise<Cast> {
+    let path = `/cast?type=url&identifier=${u}&viewer_fid=${this.fid}`;
+    let url = this.baseUrl + path;
+    let resp = await this.doRequest("GET", url, null);
+    if (resp.status !== 200) {
+      throw new Error(
+        `Failed to get cast by URL ${resp.status} ${resp.statusText}`,
+      );
+    }
+    let result = await resp.json();
+    let cast = result?.cast as Cast;
+    if (cast) {
+      console.log("Cast response", cast);
+      return cast;
+    }
+		throw new Error("Invalid response");
   }
 }

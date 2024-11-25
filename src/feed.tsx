@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { createRoot, Root } from "react-dom/client";
-import Feed from "./components/feed";
+import { Feed } from "./components/feed";
 import Farcaster from "./plugin";
 import { AppContext } from "./context";
 

@@ -3,6 +3,7 @@ import { addIcon, Editor, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
 import { ComposerModal } from "./composer";
 import { FeedView, VIEW_TYPE_FEED } from "./feed";
 import { Client } from "./client/neynar";
+import { CardMakdownRender } from "./processors";
 import {
   DEFAULT_SETTINGS,
   FarcasterSettings,
@@ -19,6 +20,7 @@ export default class Farcaster extends Plugin {
     addIcon("farcaster", farcasterIcon);
     await this.loadSettings();
     this.registerView(VIEW_TYPE_FEED, (leaf) => new FeedView(leaf, this));
+    this.addProcessor();
 
     this.client = new Client(
       this.settings.neynarAPIKey,
@@ -53,8 +55,26 @@ export default class Farcaster extends Plugin {
       },
     });
 
+
     // This adds a settings tab so the user can configure various aspects of the plugin
     this.addSettingTab(new FarcasterSettingTab(this.app, this));
+  }
+
+  addProcessor() {
+    this.registerMarkdownPostProcessor((element, context) => {
+      const links = element.findAll("a");
+      for (let link of links) {
+        const href = link.getAttribute("href");
+        if (href && href.startsWith("https://warpcast")) {
+          console.log("processing link", href);
+          this.client.getCastByUrl(href).then((cast) => {
+            if (cast) {
+              context.addChild(new CardMakdownRender(link, cast));
+            }
+          });
+        }
+      }
+    });
   }
 
   async activateView() {

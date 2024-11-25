@@ -1,23 +1,15 @@
 import { useEffect, useState } from "react";
-import { Cast, CastEmbed, CastsResponse, Embed } from "../client/types";
+import { CastsResponse } from "../client/types";
 import { Client } from "../client/neynar";
-import { AppContext, useAppCtx } from "src/context";
+import { useAppCtx } from "src/context";
+import { CastCard } from "./castCard";
+
 type Props = {
   client: Client;
   showComposer: () => void;
 };
 
-const Cast = (props: { cast: Cast }) => {
-  return (
-    <div className="cast">
-      <p>{props.cast.text}</p>
-      <p>{props.cast.author.username}</p>
-      )
-    </div>
-  );
-};
-
-const Feed = (props: Props) => {
+export const Feed = (props: Props) => {
   const { plugin } = useAppCtx();
   const [feed, setFeed] = useState<CastsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -69,58 +61,3 @@ const Feed = (props: Props) => {
     </div>
   );
 };
-
-const CastCard = (props: { cast: Cast | CastEmbed; embed?: boolean }) => {
-  if (!props.cast) {
-    return null;
-  }
-  let recastClass = "";
-  if (props.embed) {
-    recastClass = "cast-recast-embed";
-  }
-  return (
-    <div className={`cast-card ${recastClass}`}>
-      <div className="cast-header">
-        <img
-          className="avatar"
-          src={props.cast.author?.pfp_url}
-        />
-        <span className="author">{props.cast.author?.display_name}</span>
-      </div>
-
-      {props.cast?.text && (
-        <div className="cast-content">
-          <p>{props.cast.text}</p>
-        </div>
-      )}
-      <div className="cast-media">
-        {props.cast?.embeds?.map((embed, i) => (
-          <div
-            className="cast-embed-container"
-            key={props.cast.hash + "embed" + i}
-          >
-            <Embed embed={embed} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const Embed = (props: { embed: Embed }) => {
-  if (props.embed?.cast) {
-    return <CastCard cast={props.embed.cast} embed />;
-  }
-  if (props.embed?.metadata?.image) {
-    return (
-      <img
-        className="cast-embed-image"
-        src={props.embed.url}
-      />
-    );
-  }
-
-  return null;
-};
-
-export default Feed;
