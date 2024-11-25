@@ -13,6 +13,7 @@ export class FeedView extends ItemView {
   constructor(leaf: WorkspaceLeaf, plugin: Farcaster) {
     super(leaf);
     this.plugin = plugin;
+    this.icon = "farcaster";
   }
 
   getViewType() {

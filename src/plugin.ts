@@ -8,6 +8,7 @@ import {
   FarcasterSettings,
   FarcasterSettingTab,
 } from "./settings";
+import { farcasterIcon } from "./icons";
 
 export default class Farcaster extends Plugin {
   settings: FarcasterSettings;
@@ -15,6 +16,7 @@ export default class Farcaster extends Plugin {
   private server: http.Server | null = null;
 
   async onload() {
+    addIcon("farcaster", farcasterIcon);
     await this.loadSettings();
     this.registerView(VIEW_TYPE_FEED, (leaf) => new FeedView(leaf, this));
 
@@ -26,7 +28,7 @@ export default class Farcaster extends Plugin {
 
     console.log("Farcaster loaded");
 
-    this.addRibbonIcon("dice", "Farcaster", () => {
+    this.addRibbonIcon("farcaster", "Farcaster", () => {
       this.activateView();
     });
 
