@@ -65,10 +65,22 @@ export class Client {
     }
   }
 
+  async getChannelFeed(ids: string[]): Promise<CastsResponse> {
+    let path = "/feed/channels" +
+      `?with_recasts=true&channel_ids=${
+        ids.join(",")
+      }&fid=${this.fid}&viewer_fid=${this.fid}`;
+    return await this.getFeedCasts(this.baseUrl + path);
+  }
+
   async getFeed(): Promise<CastsResponse> {
     let path = "/feed/following" +
       `?with_recasts=true&fid=${this.fid}&viewer_fid=${this.fid}`;
     let url = this.baseUrl + path;
+    return await this.getFeedCasts(url);
+  }
+
+  async getFeedCasts(url: string): Promise<CastsResponse> {
     let resp = await this.doRequest("GET", url, null);
 
     if (resp.status !== 200) {
@@ -85,6 +97,25 @@ export class Client {
 
     throw new Error("Invalid response");
   }
+
+  async getUserChannels(): Promise<ChannelsResponse> {
+    let path = `/user/channels?limit=100&fid=${this.fid}`;
+    let url = this.baseUrl + path;
+    let resp = await this.doRequest("GET", url, null);
+    if (resp.status !== 200) {
+      throw new Error(
+        `Failed to get user channels ${resp.status} ${resp.statusText}`,
+      );
+    }
+    let result = await resp.json();
+    let channelsResponse = result as ChannelsResponse;
+    if (channelsResponse.channels) {
+      console.log("Channels response", channelsResponse);
+      return channelsResponse;
+    }
+    throw new Error("Invalid response");
+  }
+
   async getCastByUrl(u: string): Promise<Cast> {
     let path = `/cast?type=url&identifier=${u}&viewer_fid=${this.fid}`;
     let url = this.baseUrl + path;
@@ -100,6 +131,6 @@ export class Client {
       console.log("Cast response", cast);
       return cast;
     }
-		throw new Error("Invalid response");
+    throw new Error("Invalid response");
   }
 }

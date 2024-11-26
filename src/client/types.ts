@@ -2,6 +2,10 @@ export interface CastsResponse {
   casts: Cast[];
   next: NextCursor;
 }
+export interface ChannelsResponse {
+	  channels: Channel[];
+  next: NextCursor;
+}
 
 interface NextCursor {
   cursor: string;
@@ -189,7 +193,6 @@ interface OembedData {
   height: number;
 }
 
-
 interface AuthorDehydrated {
   object: string;
   fid: number;
@@ -198,7 +201,7 @@ interface AuthorDehydrated {
   pfp_url: string;
 }
 
-interface Channel {
+export interface Channel {
   id: string;
   url: string;
   name: string;
