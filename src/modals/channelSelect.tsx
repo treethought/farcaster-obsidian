@@ -38,7 +38,5 @@ export class ChannelSelect extends SuggestModal<Channel> {
     this.plugin.client.getUserChannels().then((resp: ChannelsResponse) => {
       this.channels = resp.channels;
     });
-
-    this.inputEl.focus();
   }
 }

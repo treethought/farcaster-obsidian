@@ -73,9 +73,9 @@ export class Client {
     return await this.getFeedCasts(this.baseUrl + path);
   }
 
-  async getFeed(): Promise<CastsResponse> {
-    let path = "/feed/following" +
-      `?with_recasts=true&fid=${this.fid}&viewer_fid=${this.fid}`;
+  async getFeed(f: string): Promise<CastsResponse> {
+    let path = "/feed/" + f +
+      `?with_recasts=true&fid=${this.fid}&viewer_fid=${this.fid}&limit=50`;
     let url = this.baseUrl + path;
     return await this.getFeedCasts(url);
   }
