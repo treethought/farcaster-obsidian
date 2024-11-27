@@ -23,11 +23,7 @@ export default class Farcaster extends Plugin {
     this.registerView(VIEW_TYPE_FEED, (leaf) => new FeedView(leaf, this));
     this.addProcessor();
 
-    this.client = new Client(
-      this.settings.neynarAPIKey,
-      this.settings.neynarClientId,
-    );
-    this.client.setSignerData(this.settings.signerUUID, this.settings.fid);
+    this.client = new Client(this.settings);
 
     console.log("Farcaster loaded");
 
@@ -68,6 +64,7 @@ export default class Farcaster extends Plugin {
   }
 
   addProcessor() {
+    console.log("adding processor");
     this.registerMarkdownPostProcessor((element, context) => {
       const links = element.findAll("a");
       for (let link of links) {
@@ -134,11 +131,7 @@ export default class Farcaster extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
-    this.client.setSignerData(this.settings.signerUUID, this.settings.fid);
-    this.client.setCredentials(
-      this.settings.neynarAPIKey,
-      this.settings.neynarClientId,
-    );
+    this.client.updateSettings(this.settings);
   }
 
   async handleAuthResult(signerUUID: string | null, fid: string | null) {

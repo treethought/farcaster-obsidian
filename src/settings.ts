@@ -1,8 +1,9 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import Farcaster from "./plugin";
 
-const SIGNIN_URL =
-  "https://amnisiac.mypinata.cloud/ipfs/QmSYwh1K4VBB5JywsRAgdype6znRB5Loz9a98oPz7mugFq?pinataGatewayToken=UFeGg0sVn0f2GdYVEUj8bmp4e4eTnqzOm_EMjDsKnVTmz4tpKcG__2X245d1ABuZ";
+const PROXY_URL = "https://farcaster-obsidian-holy-dream-8544.fly.dev";
+const PROXY_SIGNIN_URL = PROXY_URL + "/signin";
+const NEYNAR_URL = "https://api.neynar.com/v2/farcaster";
 
 export interface FarcasterSettings {
   neynarAPIKey: string;
@@ -10,14 +11,18 @@ export interface FarcasterSettings {
   signinUrl: string;
   signerUUID: string | null;
   fid: string | null;
+  apiBaseUrl: string;
+  customAPI: boolean;
 }
 
 export const DEFAULT_SETTINGS: FarcasterSettings = {
   neynarAPIKey: "",
   neynarClientId: "",
-  signinUrl: SIGNIN_URL,
+  signinUrl: PROXY_URL,
   signerUUID: "",
   fid: "",
+  apiBaseUrl: PROXY_URL,
+  customAPI: false,
 };
 
 export class FarcasterSettingTab extends PluginSettingTab {
@@ -34,6 +39,33 @@ export class FarcasterSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
+      .setName("Signer UUID")
+      .setDesc(
+        "Neynar managed signer. May only be used with the client ID used to create it",
+      )
+      .addText((text) =>
+        text
+          .setPlaceholder("Sign in to create signer")
+          .setValue(this.plugin.settings.signerUUID || "")
+          .onChange(async (value) => {
+            this.plugin.settings.signerUUID = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("FID")
+      .setDesc("Optional Farcaster ID to use for viewer context")
+      .addText((text) =>
+        text
+          .setPlaceholder("FID of the signer's account")
+          .setValue(this.plugin.settings.fid || "")
+          .onChange(async (value) => {
+            this.plugin.settings.fid = value;
+            await this.plugin.saveSettings();
+          })
+      );
+    new Setting(containerEl)
       .setName("Sign in with Neynar")
       .setDesc("Click to sign in or update signer")
       .addButton((btn) => {
@@ -41,13 +73,34 @@ export class FarcasterSettingTab extends PluginSettingTab {
         btn.onClick(async () => {
           this.plugin.startServer();
           console.log(window);
-          window.open(SIGNIN_URL, "_blank");
+          window.open(this.plugin.settings.signinUrl, "_blank");
         });
       });
 
+    new Setting(containerEl).setName("Neynar")
+      .setHeading();
+
+    new Setting(containerEl).setName("Use Custom Neynar App")
+      .setDesc("Use your own Nenay App and credentials")
+      .addToggle(async (toggle) => {
+        toggle.onChange(async (value) => {
+          if (value) {
+            console.log("custom api");
+            this.plugin.settings.customAPI = true;
+            this.plugin.settings.apiBaseUrl = NEYNAR_URL;
+          } else {
+            console.log("default api");
+            this.plugin.settings.customAPI = false;
+            this.plugin.settings.apiBaseUrl = PROXY_URL;
+            this.plugin.settings.signinUrl = PROXY_SIGNIN_URL;
+          }
+          await this.plugin.saveSettings();
+        });
+      })
+      .setHeading();
+
     new Setting(containerEl)
       .setName("Neynar App Client ID")
-      .setDesc("Client ID for your own Neynar app")
       .addText((text) =>
         text
           .setValue(this.plugin.settings.neynarClientId)
@@ -58,7 +111,6 @@ export class FarcasterSettingTab extends PluginSettingTab {
       );
     new Setting(containerEl)
       .setName("Neynar App API Key")
-      .setDesc("API Key for your own Neynar app")
       .addText((text) =>
         text
           .setPlaceholder("")
@@ -91,33 +143,5 @@ export class FarcasterSettingTab extends PluginSettingTab {
           );
         });
       });
-
-    new Setting(containerEl)
-      .setName("Signer UUID")
-      .setDesc(
-        "Neynar managed signer. May only be used with the client ID used to create it",
-      )
-      .addText((text) =>
-        text
-          .setPlaceholder("Sign in to create signer")
-          .setValue(this.plugin.settings.signerUUID || "")
-          .onChange(async (value) => {
-            this.plugin.settings.signerUUID = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("FID")
-      .setDesc("Farcaster ID")
-      .addText((text) =>
-        text
-          .setPlaceholder("FID of the signer's account")
-          .setValue(this.plugin.settings.fid || "")
-          .onChange(async (value) => {
-            this.plugin.settings.fid = value;
-            await this.plugin.saveSettings();
-          })
-      );
   }
 }

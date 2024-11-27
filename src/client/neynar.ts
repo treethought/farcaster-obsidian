@@ -1,40 +1,29 @@
+import { FarcasterSettings } from "src/settings";
 import { Cast, CastsResponse, ChannelsResponse } from "./types";
 
 export class Client {
-  apiKey: string;
-  clientId: string;
-  signerUUID: string | null;
-  fid: string | null;
-  baseUrl: string = "https://api.neynar.com/v2/farcaster";
+  settings: FarcasterSettings;
 
-  constructor(apiKey: string, clientId: string) {
-    this.apiKey = apiKey;
-    this.clientId = clientId;
-    console.log("Client created with API key: ", apiKey);
+  constructor(settings: FarcasterSettings) {
+    this.settings = settings;
   }
 
-  setCredentials(apiKey: string, clientId: string) {
-    this.apiKey = apiKey;
-    this.clientId = clientId;
-  }
-
-  setSignerData(signerUUID: string | null, fid: string | null) {
-    this.signerUUID = signerUUID;
-    this.fid = fid;
-    console.log("setSignerData", signerUUID, fid);
+  updateSettings(settings: FarcasterSettings) {
+    this.settings = settings;
   }
 
   async doRequest(method: string, url: string, body: any): Promise<Response> {
-    if (!this.apiKey) {
-      throw new Error("No API key set");
+    let headers: Record<string, string> = {
+      "accept": "application/json",
+      "content-type": "application/json",
+    };
+    if (this.settings.customAPI && this.settings.neynarAPIKey) {
+      headers["x-api-key"] = this.settings.neynarAPIKey;
     }
+
     let options: RequestInit = {
       method: method,
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        "x-api-key": this.apiKey,
-      },
+      headers: headers,
     };
 
     if (body) {
@@ -45,14 +34,14 @@ export class Client {
   }
 
   async publishCast(text: string): Promise<Response> {
-    if (!this.signerUUID) {
+    if (!this.settings.signerUUID) {
       throw new Error("No signer UUID set");
     }
     console.log("publishing cast: ");
-    let url = this.baseUrl + "/cast";
+    let url = this.settings.apiBaseUrl + "/cast";
 
     let resp = await this.doRequest("POST", url, {
-      signer_uuid: this.signerUUID,
+      signer_uuid: this.settings.signerUUID,
       text: text,
     });
 
@@ -69,14 +58,14 @@ export class Client {
     let path = "/feed/channels" +
       `?with_recasts=true&channel_ids=${
         ids.join(",")
-      }&fid=${this.fid}&viewer_fid=${this.fid}`;
-    return await this.getFeedCasts(this.baseUrl + path);
+      }&fid=${this.settings.fid}&viewer_fid=${this.settings.fid}`;
+    return await this.getFeedCasts(this.settings.apiBaseUrl + path);
   }
 
   async getFeed(f: string): Promise<CastsResponse> {
     let path = "/feed/" + f +
-      `?with_recasts=true&fid=${this.fid}&viewer_fid=${this.fid}&limit=50`;
-    let url = this.baseUrl + path;
+      `?with_recasts=true&fid=${this.settings.fid}&viewer_fid=${this.settings.fid}&limit=50`;
+    let url = this.settings.apiBaseUrl + path;
     return await this.getFeedCasts(url);
   }
 
@@ -99,8 +88,8 @@ export class Client {
   }
 
   async getUserChannels(): Promise<ChannelsResponse> {
-    let path = `/user/channels?limit=100&fid=${this.fid}`;
-    let url = this.baseUrl + path;
+    let path = `/user/channels?limit=100&fid=${this.settings.fid}`;
+    let url = this.settings.apiBaseUrl + path;
     let resp = await this.doRequest("GET", url, null);
     if (resp.status !== 200) {
       throw new Error(
@@ -117,8 +106,8 @@ export class Client {
   }
 
   async getCastByUrl(u: string): Promise<Cast> {
-    let path = `/cast?type=url&identifier=${u}&viewer_fid=${this.fid}`;
-    let url = this.baseUrl + path;
+    let path = `/cast?type=url&identifier=${u}&viewer_fid=${this.settings.fid}`;
+    let url = this.settings.apiBaseUrl + path;
     let resp = await this.doRequest("GET", url, null);
     if (resp.status !== 200) {
       throw new Error(

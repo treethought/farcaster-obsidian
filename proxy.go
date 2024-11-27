@@ -1,18 +1,29 @@
 package main
 
 import (
+	_ "embed"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strings"
+	"text/template"
 )
+
+//go:embed siwn.html
+var sinwhtml []byte
 
 func main() {
 	target := "https://api.neynar.com/v2/farcaster"
 	u, err := url.Parse(target)
 	if err != nil {
 		log.Fatalf("Invalid target URL: %v", err)
+	}
+
+	clientID := os.Getenv("CLIENT_ID")
+	if clientID == "" {
+		log.Fatal("CLIENT_ID not set in environment")
 	}
 
 	apiKey := os.Getenv("API_KEY")
@@ -28,8 +39,30 @@ func main() {
 		return nil
 	}
 
+	http.HandleFunc("/signin", func(w http.ResponseWriter, r *http.Request) {
+		tmpl, err := template.New("signin").Parse(string(sinwhtml))
+		if err != nil {
+			log.Fatal("failed to parse template: ", err)
+		}
+		data := struct {
+			ClientID string
+		}{
+			ClientID: clientID,
+		}
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			log.Println("failed to execute template: ", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Request: %s %s", r.Method, r.URL.String())
+
+		if !strings.HasPrefix(r.URL.Path, "/v2/farcaster") {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 
 		if r.Method == "OPTIONS" {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
