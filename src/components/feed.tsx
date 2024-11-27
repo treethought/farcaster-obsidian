@@ -4,7 +4,6 @@ import { Client } from "../client/neynar";
 import { useAppCtx } from "src/context";
 import { CastCard } from "./castCard";
 import { ChannelSelect } from "src/modals/channelSelect";
-import { ElementWrapper } from "src/components/wrapper";
 import { TabBar } from "src/components/feedBar";
 
 type Props = {
@@ -19,6 +18,7 @@ export const Feed = (props: Props) => {
   const [error, setError] = useState<string | null>(null);
   const [selectEl, setSelectEl] = useState<ChannelSelect | null>(null);
   const [activeTab, setActiveTab] = useState("Following");
+  const [cmdAdded, setCmdAdded] = useState(false);
 
   const navTabs = () => {
     const tabs = ["Following", "For You", "Select Channel"];
@@ -105,6 +105,19 @@ export const Feed = (props: Props) => {
       setSelectEl(cs);
     }
   }, [selectEl, setSelectEl, plugin]);
+
+  const addChannelCmd = () => {
+    plugin.addChannelSelectCommand(() => {
+      selectEl?.open();
+    });
+  };
+
+  useEffect(() => {
+    if (!cmdAdded && selectEl && plugin) {
+      addChannelCmd();
+      setCmdAdded(true);
+    }
+  }, [cmdAdded, plugin, selectEl]);
 
   useEffect(() => {
     if (!feed && !error) {

@@ -35,7 +35,14 @@ export default class Farcaster extends Plugin {
       this.activateView();
     });
 
-    console.log("Adding command");
+    this.addCommand({
+      id: "farcaster-feed",
+      name: "Open Farcaster Feed",
+      callback: () => {
+        this.activateView();
+      },
+    });
+
     this.addCommand({
       id: "farcaster-cast",
       name: "Publish a Cast",
@@ -56,7 +63,6 @@ export default class Farcaster extends Plugin {
       },
     });
 
-
     // This adds a settings tab so the user can configure various aspects of the plugin
     this.addSettingTab(new FarcasterSettingTab(this.app, this));
   }
@@ -75,6 +81,16 @@ export default class Farcaster extends Plugin {
           });
         }
       }
+    });
+  }
+
+  addChannelSelectCommand(cb: () => void) {
+    this.addCommand({
+      id: "farcaster-select-channel",
+      name: "View Channel",
+      callback: () => {
+        cb();
+      },
     });
   }
 
