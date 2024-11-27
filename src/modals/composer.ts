@@ -5,7 +5,7 @@ import {
   Notice,
   TextAreaComponent,
 } from "obsidian";
-import Farcaster from "./plugin";
+import Farcaster from "../plugin";
 
 export class ComposerModal extends Modal {
   plugin: Farcaster;

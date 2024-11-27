@@ -1,6 +1,6 @@
 import * as http from "http";
 import { addIcon, Editor, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
-import { ComposerModal } from "./composer";
+import { ComposerModal } from "./modals/composer";
 import { FeedView, VIEW_TYPE_FEED } from "./feed";
 import { Client } from "./client/neynar";
 import { CardMakdownRender } from "./processors";
@@ -19,6 +19,7 @@ export default class Farcaster extends Plugin {
   async onload() {
     addIcon("farcaster", farcasterIcon);
     await this.loadSettings();
+
     this.registerView(VIEW_TYPE_FEED, (leaf) => new FeedView(leaf, this));
     this.addProcessor();
 

@@ -3,7 +3,8 @@ import { CastsResponse, Channel } from "../client/types";
 import { Client } from "../client/neynar";
 import { useAppCtx } from "src/context";
 import { CastCard } from "./castCard";
-import { ChannelSelect, ElementWrapper } from "src/feed";
+import { ChannelSelect } from "../modals/channelSelect";
+import { ElementWrapper } from "src/components/wrapper";
 
 type Props = {
   client: Client;
