@@ -14,12 +14,12 @@ export const TabBar = (props: Props) => {
   };
 
   return (
-    <div className="nav-tab-bar">
+    <div className="feed-nav-tab-bar">
       {props.tabs.map((tab) => (
         <button
           key={tab}
           onClick={() => handleSelect(tab)}
-          className={`nav-tab ${activeTab === tab ? "active-tab " : ""}`}
+          className={`feed-nav-tab ${activeTab === tab ? "active-tab " : ""}`}
         >
           {tab}
         </button>

@@ -17,13 +17,15 @@ export const Feed = (props: Props) => {
   const [feed, setFeed] = useState<CastsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectEl, setSelectEl] = useState<ChannelSelect | null>(null);
-  const [activeTab, setActiveTab] = useState("Following");
   const [cmdAdded, setCmdAdded] = useState(false);
+  const [feedId, setFeedId] = useState<string | null>("Following");
 
   const navTabs = () => {
-    const tabs = ["Following", "For You", "Select Channel"];
+    const tabs = ["Following", "For You"];
     if (channel) {
       tabs.push(channel.name);
+    } else {
+      tabs.push("Select Channel");
     }
 
     return tabs;
@@ -34,37 +36,37 @@ export const Feed = (props: Props) => {
   }
 
   const refresh = async () => {
-    console.log("refresh: ", activeTab);
 
-    if (navTabs().indexOf(activeTab) >= 2) {
-      console.log("refresh channel: ", channel);
-      if (!channel) {
-        selectEl?.open();
-        return;
-      }
-      await fetchChannel(channel);
-      setActiveTab(navTabs().last() ?? "Following");
-      return;
-    }
-
-    switch (activeTab) {
+    switch (feedId) {
       case "For You":
         await fetchFeed("For You");
         break;
-      default:
+      case "Following":
         await fetchFeed("Following");
         break;
+      default:
+        if (channel) {
+          await fetchChannel(channel);
+          return;
+        }
+        await fetchFeed("Following");
     }
   };
 
   const handleChannelSelect = async (channel: Channel) => {
     console.log("channel selected: ", channel);
     setChannel(channel);
+    setFeedId(channel.id);
+    plugin.activateView();
   };
 
   const handleTabChange = async (tab: string) => {
-    console.log("tab: ", tab);
-    setActiveTab(tab);
+
+    if (navTabs().indexOf(tab) === 2) {
+      selectEl?.open();
+      return;
+    }
+    setFeedId(tab);
   };
 
   const fetchChannel = async (c: Channel) => {
@@ -96,7 +98,7 @@ export const Feed = (props: Props) => {
 
   useEffect(() => {
     refresh();
-  }, [activeTab, channel]);
+  }, [feedId]);
 
   useEffect(() => {
     if (!selectEl) {
@@ -121,22 +123,29 @@ export const Feed = (props: Props) => {
 
   useEffect(() => {
     if (!feed && !error) {
-      fetchFeed("Following");
+      setFeedId("Following");
     }
   }, []);
 
   return (
-    <div className="flex-col">
-      <div className="flex-row">
+    <div>
+      <div className="feed-header">
         <TabBar tabs={navTabs()} onSelect={handleTabChange} />
-      </div>
-      <div className="flex-row">
-        <button onClick={() => refresh()}>Refresh</button>
-        <button onClick={() => plugin.showComposer()}>Cast</button>
+        <div className="feed-actions">
+          <button className="feed-action-btn" onClick={() => refresh()}>
+            Refresh
+          </button>
+          <button
+            className="feed-action-btn"
+            onClick={() => plugin.showComposer()}
+          >
+            Cast
+          </button>
+        </div>
       </div>
       {error && <div>Error: {error}</div>}
       {!feed && <div>Loading...</div>}
-      <div className="cast-feed">
+      <div className="feed">
         {feed?.casts.map((cast, i) => (
           <CastCard cast={cast} key={cast.hash + i} />
         ))}
