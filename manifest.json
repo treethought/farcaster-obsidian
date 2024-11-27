@@ -1,11 +1,11 @@
 {
-	"id": "farcaster-obsidian",
-	"name": "Farcaster Obsidian",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Farcaster client in Obsidian",
-	"author": "treethought",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
+  "id": "farcaster-obsidian",
+  "name": "Farcaster Obsidian",
+  "version": "0.0.1",
+  "minAppVersion": "0.15.0",
+  "description": "Farcaster client in Obsidian",
+  "author": "treethought",
+  "authorUrl": "https://obsidian.md",
+  "fundingUrl": "https://obsidian.md/pricing",
+  "isDesktopOnly": false
 }
