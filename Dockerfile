@@ -9,6 +9,7 @@ COPY go.mod .
 RUN go mod download
 
 COPY proxy.go .
+COPY siwn.html .
 RUN go build -o neynar-proxy proxy.go
 RUN mv ./neynar-proxy /usr/bin/neynar-proxy
 

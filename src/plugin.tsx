@@ -11,6 +11,8 @@ import {
 } from "./settings";
 import { farcasterIcon } from "./icons";
 
+const USE_CALLBACK_SERVER = false;
+
 export default class Farcaster extends Plugin {
   settings: FarcasterSettings;
   client: Client;
@@ -144,6 +146,9 @@ export default class Farcaster extends Plugin {
   }
 
   async startServer() {
+    if (!USE_CALLBACK_SERVER) {
+      return;
+    }
     const PORT = 9123;
 
     this.server = http.createServer(async (req, res) => {

@@ -14,5 +14,5 @@ export const useAppCtx = (): Context => {
   if (!context) {
     throw new Error("useAppCtx must be used within an AppContext.Provider");
   }
-  return context
+  return context;
 };

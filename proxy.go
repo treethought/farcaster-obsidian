@@ -15,7 +15,7 @@ import (
 var sinwhtml []byte
 
 func main() {
-	target := "https://api.neynar.com/v2/farcaster"
+	target := "https://api.neynar.com/"
 	u, err := url.Parse(target)
 	if err != nil {
 		log.Fatalf("Invalid target URL: %v", err)
@@ -35,6 +35,9 @@ func main() {
 		log.Printf("Error: %v", err)
 	}
 	proxy.ModifyResponse = func(r *http.Response) error {
+		if r.StatusCode != http.StatusOK {
+			log.Printf("Response: %s %s", r.Status, r.Request.URL.String())
+		}
 		r.Header.Del("Access-Control-Allow-Origin")
 		return nil
 	}
@@ -57,7 +60,7 @@ func main() {
 	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Request: %s %s", r.Method, r.URL.String())
+		log.Printf("%s %s", r.Method, r.URL.String())
 
 		if !strings.HasPrefix(r.URL.Path, "/v2/farcaster") {
 			w.WriteHeader(http.StatusNotFound)

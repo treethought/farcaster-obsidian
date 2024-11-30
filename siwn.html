@@ -4,11 +4,15 @@
 	<div class="neynar_signin" data-client_id="{{.ClientID}}" data-success-callback="onSignInSuccess" data-theme="dark">
 		<!-- defaults to light, unless specified -->
 	</div>
+	<div id="signin-results"></div>
 	<script src="https://neynarxyz.github.io/siwn/raw/1.2.0/index.js" async></script>
 	<script>
 		function onSignInSuccess(data) {
-			window.location.href = "http://127.0.0.1:9123/signin/success?fid=" + data.fid + "&signer_uuid=" + data.signer_uuid;
-			console.log("Sign-in success with data:", data);
+			document.getElementById("signin-results").innerHTML = `<div>
+					<p>Sign-in success, add these to settings:</p>
+					<span>fid: ${data.fid}</span>
+				<span>signer_uuid: <pre>${data.signer_uuid}</pre></span>
+				</div>`
 		}
 	</script>
 </body>

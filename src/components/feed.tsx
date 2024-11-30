@@ -36,7 +36,6 @@ export const Feed = (props: Props) => {
   }
 
   const refresh = async () => {
-
     switch (feedId) {
       case "For You":
         await fetchFeed("For You");
@@ -61,7 +60,6 @@ export const Feed = (props: Props) => {
   };
 
   const handleTabChange = async (tab: string) => {
-
     if (navTabs().indexOf(tab) === 2) {
       selectEl?.open();
       return;
@@ -90,6 +88,7 @@ export const Feed = (props: Props) => {
         feed = await props.client.getFeed("following");
       }
       setFeed(feed);
+      setError(null);
     } catch (e) {
       setFeed(null);
       setError(e.message);
