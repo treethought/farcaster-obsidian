@@ -57,11 +57,30 @@
 
 .cast-header {
 	display: flex;
+	width: 100%;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	/*padding: 10px;*/
+	/*gap: 10px;*/
+	border-bottom: 1px solid var(--background-modifier-border-focus);
+}
+
+.cast-header-author {
+	display: flex;
 	flex-direction: row;
 	align-items: center;
 	padding: 10px;
 	gap: 10px;
-	border-bottom: 1px solid var(--background-modifier-border-focus);
+}
+
+.cast-header-channel {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	color: var(--text-accent);
+	padding: 10px;
+	gap: 10px;
 }
 
 .avatar {
@@ -69,7 +88,7 @@
 	height: 45px;
 	border-radius: 50%;
 	object-fit: cover;
-
+	flex: 0 0 45px;
 }
 
 .author {
