@@ -1,8 +1,11 @@
+import { useContext } from "react";
+import { AppContext, useAppCtx } from "src/context";
 import { Cast, CastEmbed, Embed } from "../client/types";
 
 export const CastCard = (
 	props: { cast: Cast | CastEmbed; embed?: boolean },
 ) => {
+	const { setChannel } = useAppCtx();
 	if (!props.cast) {
 		return null;
 	}
@@ -22,7 +25,11 @@ export const CastCard = (
 				</div>
 
 				{props.cast?.channel && (
-					<pre className="cast-header-channel">/{props.cast.channel.name}</pre>
+					<button
+						onClick={() => setChannel(props.cast.channel)}
+					>
+						<pre className="cast-header-channel">/{props.cast.channel.name}</pre>
+					</button>
 				)}
 			</div>
 
