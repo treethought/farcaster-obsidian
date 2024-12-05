@@ -1,18 +1,27 @@
-import { useContext } from "react";
-import { AppContext, useAppCtx } from "src/context";
+import { useAppCtx } from "src/context";
 import { Cast, CastEmbed, Embed } from "../client/types";
+import { ExternalLink, Heart, Repeat2 } from "lucide-react";
+import { Notice } from "obsidian";
+
+const castUrl = (cast: Cast | CastEmbed) => {
+	return `https://warpcast.com/${cast.author.username}/${cast.hash}`;
+};
 
 export const CastCard = (
 	props: { cast: Cast | CastEmbed; embed?: boolean },
 ) => {
-	const { setChannel } = useAppCtx();
+	const { setChannel, plugin } = useAppCtx();
 	if (!props.cast) {
 		return null;
 	}
 	let recastClass = "";
 	if (props.embed) {
 		recastClass = "cast-recast-embed";
+		props.cast = props.cast as CastEmbed;
+	} else {
+		props.cast = props.cast as Cast;
 	}
+
 	return (
 		<div className={`cast-card ${recastClass}`}>
 			<div className="cast-header">
@@ -38,16 +47,52 @@ export const CastCard = (
 					<p>{props.cast.text}</p>
 				</div>
 			)}
-			<div className="cast-media">
-				{props.cast?.embeds?.map((embed, i) => (
-					<div
-						className="cast-embed-container"
-						key={props.cast.hash + "embed" + i}
+			{props.cast?.embeds?.length > 0 && (
+				<div className="cast-media">
+					{props.cast?.embeds?.map((embed, i) => (
+						<div
+							className="cast-embed-container"
+							key={props.cast.hash + "embed" + i}
+						>
+							<EmbedRender embed={embed} />
+						</div>
+					))}
+				</div>
+			)}
+			{!props.embed && (
+				<div className="cast-footer">
+					<button
+						className="cast-footer-button"
+						onClick={() => window.open(castUrl(props.cast), "_blank")}
 					>
-						<EmbedRender embed={embed} />
-					</div>
-				))}
-			</div>
+						<ExternalLink />
+					</button>
+					<button
+						className="cast-footer-button"
+						onClick={async () => {
+							try {
+								await plugin.client.react(props.cast.hash, true);
+							} catch (e) {
+								new Notice("Error recasting cast: " + e, 0);
+							}
+						}}
+					>
+						<Repeat2 />
+					</button>
+					<button
+						className="cast-footer-button"
+						onClick={async () => {
+							try {
+								await plugin.client.react(props.cast.hash);
+							} catch (e) {
+								new Notice("Error liking cast: " + e, 0);
+							}
+						}}
+					>
+						<Heart />
+					</button>
+				</div>
+			)}
 		</div>
 	);
 };

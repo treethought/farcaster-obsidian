@@ -83,6 +83,19 @@
 	gap: 10px;
 }
 
+.cast-footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding: 10px;
+}
+
+button.cast-footer-button {
+	padding: 10px;
+	background-color: var(--interactive-normal);
+
+}
+
 .avatar {
 	width: 45px;
 	height: 45px;

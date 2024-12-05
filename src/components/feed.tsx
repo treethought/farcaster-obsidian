@@ -53,6 +53,10 @@ export const Feed = (props: Props) => {
 
 	const handleChannelSelect = async (channel: Channel) => {
 		console.log("channel selected: ", channel);
+		if (!channel?.id) {
+			return;
+		}
+
 		setChannel(channel);
 		setFeedId(channel.id);
 		plugin.activateView();
