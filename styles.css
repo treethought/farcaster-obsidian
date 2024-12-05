@@ -96,6 +96,12 @@ button.cast-footer-button {
 
 }
 
+button.button-filled {
+	color: pink;
+	background-color: var(--interactive-accent);
+
+}
+
 .avatar {
 	width: 45px;
 	height: 45px;

@@ -14,16 +14,19 @@ export const CastCard = (
 	if (!props.cast) {
 		return null;
 	}
-	let recastClass = "";
+	let recastedClass = "";
+	let likedClass = "";
+	let embedClass = "";
 	if (props.embed) {
-		recastClass = "cast-recast-embed";
-		props.cast = props.cast as CastEmbed;
+		embedClass = "cast-recast-embed";
 	} else {
-		props.cast = props.cast as Cast;
+		let cast = props.cast as Cast;
+		likedClass = cast.viewer_context.liked ? "button-filled" : "";
+		recastedClass = cast.viewer_context.recasted ? "button-filled" : "";
 	}
 
 	return (
-		<div className={`cast-card ${recastClass}`}>
+		<div className={`cast-card ${embedClass}`}>
 			<div className="cast-header">
 				<div className="cast-header-author">
 					<img
@@ -47,7 +50,7 @@ export const CastCard = (
 					<p>{props.cast.text}</p>
 				</div>
 			)}
-			{props.cast?.embeds?.length > 0 && (
+			{props?.cast?.embeds?.length > 0 && (
 				<div className="cast-media">
 					{props.cast?.embeds?.map((embed, i) => (
 						<div
@@ -68,7 +71,7 @@ export const CastCard = (
 						<ExternalLink />
 					</button>
 					<button
-						className="cast-footer-button"
+						className={`cast-footer-button ${recastedClass}`}
 						onClick={async () => {
 							try {
 								await plugin.client.react(props.cast.hash, true);
@@ -80,7 +83,7 @@ export const CastCard = (
 						<Repeat2 />
 					</button>
 					<button
-						className="cast-footer-button"
+						className={`cast-footer-button ${likedClass}`}
 						onClick={async () => {
 							try {
 								await plugin.client.react(props.cast.hash);

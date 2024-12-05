@@ -3,6 +3,13 @@
 This is a WIP [farcaster](https://www.farcaster.xyz/) client plugin for Obsidian
 to provide a cozy, calm interface to post and read casts.
 
+## Features
+- Viewing channels feeds within obsidian
+- Liking / Recasting
+- Publish current note as cast
+- Supports Sign in with Neynar
+- Settings to use your own Neynar app
+
 ## How to use
 
 - Clone this repo.
@@ -13,4 +20,4 @@ to provide a cozy, calm interface to post and read casts.
 ## Manually installing the plugin
 
 - Copy over `main.js`, `styles.css`, `manifest.json` to your vault
-  `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+  `VaultFolder/.obsidian/plugins/farcaster-obsidian/`.
